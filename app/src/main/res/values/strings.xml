@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">ThirdEye</string>
+    <string name="picture">Picture</string>
+    <string name="description_info">Info</string>
+    <string name="request_permission">This sample needs camera permission.</string>
+    <string name="camera_error">This device doesn\'t support Camera2 API.</string>
+    <string name="intro_message">intro</string>
+    <string name="import_image">Import</string>
+    <string name="gallery">Gallery</string>
+    <string name="protanopia">Protanopia</string>
+    <string name="deuteranopia">Deuteranopia</string>
+    <string name="tritanopia">Tritanopia</string>
+    <string name="take_picture">PICTURE</string>
+    <string name="switch_camera">SWITCH</string>
+    <string name="record_video">VIDEO</string>
+    <string name="stop_video">STOP</string>
+</resources>
