@@ -1,156 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-xmlns:android="http://schemas.android.com/apk/res/android"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:orientation="horizontal"
-android:fitsSystemWindows="false">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal"
-        android:background="@color/colorPrimaryDark">
 
-        <LinearLayout
-            android:id="@+id/type_one"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@color/colorPrimary"
-            android:layout_gravity="center_horizontal"
-            android:gravity="center_vertical|left"
-            >
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:textAlignment="center"
-                android:text="@string/protanopia"
-                android:textColor="@color/white"
-                />
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/type_two"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@color/colorPrimaryDark"
-            android:layout_gravity="center_horizontal"
-            android:gravity="center_vertical|left">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:textAlignment="center"
-                android:text="@string/deuteranopia"
-                android:textColor="@color/white"
-                />
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/type_three"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@color/colorPrimaryDark"
-            android:layout_gravity="center_horizontal"
-            android:gravity="center_vertical|left">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:textAlignment="center"
-                android:text="@string/tritanopia"
-                android:textColor="@color/white"
-                />
-        </LinearLayout>
-    </LinearLayout>
-
-    <com.example.fitboyz.thirdeye.CameraSourcePreview
-        android:layout_marginTop="50dp"
-        android:id="@+id/preview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <com.example.fitboyz.thirdeye.GraphicOverlay
-            android:id="@+id/faceOverlay"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </com.example.fitboyz.thirdeye.CameraSourcePreview>
-    <FrameLayout
-        android:id="@+id/control"
-        android:layout_width="match_parent"
-        android:layout_height="112dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true">
-
-        <!--<Button-->
-        <!--android:id="@+id/left"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_gravity="center_vertical|left"-->
-        <!--android:text="@string/gallery" />-->
-
-        <Button
-            android:id="@+id/picture"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/picture" />
-
-        <!--<Button-->
-        <!--android:id="@+id/right"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_gravity="center_vertical|right"-->
-        <!--android:text="@string/import_image" />-->
-
-    </FrameLayout>
-    <LinearLayout
-        android:visibility="gone"
+    <RelativeLayout
+        android:id="@+id/btn_camera"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:orientation="horizontal">
-        <Button
-            android:id="@+id/btn_takepicture"
+        android:layout_weight="1">
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/take_picture" />
-        <Button
-            android:id="@+id/btn_video"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/record_video"/>
-        <Button
-            android:id="@+id/btn_switch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/switch_camera"/>
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="end|center_vertical">
-            <TextView
-                android:id="@+id/cameraVersion"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:layout_marginRight="10dp"
-                android:text="Camera 1"
-                android:textSize="18sp"
-                android:textColor="@android:color/white"
-                android:background="@android:color/black"/>
-        </LinearLayout>
-    </LinearLayout>
+            android:text="Camera"
+            android:layout_centerInParent="true"/>
 
-    <ImageView
-        android:id="@+id/ivAutoFocus"
-        android:contentDescription="@null"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:visibility="gone"/>
-</RelativeLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/btn_photo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Photo"
+            android:layout_centerInParent="true"/>
+    </RelativeLayout>
+
+</LinearLayout>

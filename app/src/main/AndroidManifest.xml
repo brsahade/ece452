@@ -17,11 +17,19 @@
 
         </activity>
 
-        <activity android:name=".MainActivity"  android:theme="@style/generalnotitle">
+        <activity android:name=".MainActivity" android:theme="@style/generalnotitle">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity android:name=".PhotoAcivity">
+
+        </activity>
+
+        <activity android:name=".CustomCameraActivity"  android:theme="@style/generalnotitle">
+
         </activity>
 
     </application>

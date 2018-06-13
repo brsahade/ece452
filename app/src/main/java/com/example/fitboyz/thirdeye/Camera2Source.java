@@ -355,6 +355,8 @@ public class Camera2Source {
             if(mImage == null) {
                 return;
             }
+
+
             mFrameProcessor.setNextFrame(convertYUV420888ToNV21(mImage));
             mImage.close();
         }
