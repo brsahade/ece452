@@ -5,12 +5,12 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.RelativeLayout;
+import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
 
 
-    private RelativeLayout mBtnCamera, mBtnPhoto;
+    private Button mBtnCamera, mBtnPhoto;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -18,8 +18,8 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        mBtnCamera = (RelativeLayout)findViewById(R.id.btn_camera);
-        mBtnPhoto = (RelativeLayout)findViewById(R.id.btn_photo);
+        mBtnCamera = (Button) findViewById(R.id.btn_camera);
+        mBtnPhoto = (Button)findViewById(R.id.btn_photo);
 
         mBtnCamera.setOnClickListener(new View.OnClickListener() {
             @Override
