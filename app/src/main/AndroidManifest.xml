@@ -24,7 +24,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".PhotoAcivity">
+        <activity android:name=".PhotoActivity">
 
         </activity>
 
