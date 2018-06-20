@@ -106,10 +106,10 @@ public class PhotoActivity extends AppCompatActivity {
 
         Daltonize d = new Daltonize();
         Bitmap bitmap = loadBitmap(selectedImagePath);
-        byte[] bArray = bitmapToByte(bitmap);
-        Bitmap b = BitmapFactory.decodeByteArray(bArray, 0, bArray.length);
-        Bitmap newBItmap = d.daltonizeImage(Bitmap.createScaledBitmap(b, 300, 300, false), typeId);
-        updateImage(newBItmap);
+//        byte[] bArray = bitmapToByte(bitmap);
+//        Bitmap b = BitmapFactory.decodeByteArray(bArray, 0, bArray.length);
+//        Bitmap newBItmap = d.daltonizeImage(Bitmap.createScaledBitmap(bitmap, 500, 500, false), typeId);
+        updateImage(d.daltonizeImage(bitmap, typeId));
 
     }
 
