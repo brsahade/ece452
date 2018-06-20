@@ -1,28 +1,20 @@
 package com.example.fitboyz.thirdeye;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.Image;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.bumptech.glide.Glide;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLConnection;
 
 public class PhotoActivity extends AppCompatActivity {
 
@@ -33,6 +25,7 @@ public class PhotoActivity extends AppCompatActivity {
     private Uri selectedImagePath;
     private ImageView mMainImage;
     private LinearLayout mTypeOne, mTypeTwo, mTypeThree;
+    private Button mButton;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,10 +36,18 @@ public class PhotoActivity extends AppCompatActivity {
         mTypeOne = (LinearLayout)findViewById(R.id.image_type_one);
         mTypeTwo = (LinearLayout)findViewById(R.id.image_type_two);
         mTypeThree = (LinearLayout)findViewById(R.id.image_type_three);
+        mButton = (Button)findViewById(R.id.photo_more);
 
         mTypeOne.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                view.setBackgroundColor(Color.parseColor("#3F51B5"));
+
+                View view2 = (View) findViewById(R.id.image_type_two);
+                View view3 = (View) findViewById(R.id.image_type_three);
+                view2.setBackgroundColor(Color.parseColor("#303F9F"));
+                view3.setBackgroundColor(Color.parseColor("#303F9F"));
+
                 daltonization(1);
             }
         });
@@ -54,6 +55,13 @@ public class PhotoActivity extends AppCompatActivity {
         mTypeTwo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                view.setBackgroundColor(Color.parseColor("#3F51B5"));
+
+                View view2 = (View) findViewById(R.id.image_type_one);
+                View view3 = (View) findViewById(R.id.image_type_three);
+                view2.setBackgroundColor(Color.parseColor("#303F9F"));
+                view3.setBackgroundColor(Color.parseColor("#303F9F"));
+
                 daltonization(2);
             }
         });
@@ -61,7 +69,25 @@ public class PhotoActivity extends AppCompatActivity {
         mTypeThree.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                view.setBackgroundColor(Color.parseColor("#3F51B5"));
+
+                View view2 = (View) findViewById(R.id.image_type_one);
+                View view3 = (View) findViewById(R.id.image_type_two);
+                view2.setBackgroundColor(Color.parseColor("#303F9F"));
+                view3.setBackgroundColor(Color.parseColor("#303F9F"));
+
                 daltonization(3);
+            }
+        });
+
+        mButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent,
+                        "Select Picture"), SELECT_PICTURE);
             }
         });
 
@@ -77,9 +103,10 @@ public class PhotoActivity extends AppCompatActivity {
 
     public void daltonization(int typeId) {
 
+        Daltonize d = new Daltonize();
         Bitmap bitmap = loadBitmap(selectedImagePath);
-//        Bitmap bitmapConverted = someting(bitmap, typeId);
-        updateImage(bitmap);
+        Bitmap newBItmap = d.daltonizeImage(bitmap, typeId);
+        updateImage(newBItmap);
 
     }
 
@@ -87,13 +114,8 @@ public class PhotoActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK) {
             if (requestCode == SELECT_PICTURE) {
                 Uri selectedImageUri = data.getData();
-
-//                    File file = new File(new URI(selectedImageUri.toString()));
-//                    ImageView imageView = (ImageView) findViewById(R.id.photo_view);
-//
-                    selectedImagePath = selectedImageUri;
-//                    Glide.with(this).load(selectedImageUri).into(mMainImage);
-                Glide.with(this).load(R.drawable.test).into(mMainImage);
+                selectedImagePath = selectedImageUri;
+                Glide.with(this).load(selectedImagePath).into(mMainImage);
 
             }
         }
@@ -108,14 +130,6 @@ public class PhotoActivity extends AppCompatActivity {
 
     public void updateImage(Bitmap b) {
         Glide.with(this).asBitmap().load(bitmapToByte(b)).into(mMainImage); //>>not tested
-
-//        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-//        b.compress(Bitmap.CompressFormat.PNG, 100, stream);
-//        Glide.with(this)
-//                .asBitmap()
-//                .load(stream.toByteArray())
-//                .into(mMainImage);
-
     }
 
     public Bitmap loadBitmap(Uri url)

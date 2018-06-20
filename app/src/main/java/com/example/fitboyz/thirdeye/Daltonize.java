@@ -16,32 +16,20 @@ public class Daltonize {
     Color [][][] precomputeDeutranopia;
     Color [][][] precomputeTritanopia;
 
-    double [][] convertRGB = [[0.08094444, -0.1305044, 0.116721066], [-0.010248533514, 0.05401932663599884, -0.11361470821404349], [-0.0003652969378610491, -0.004121614685876285, 0.6935114048608589]]
-    double [][] convertLMS = [[17.8824, 43.5161, 4.11935], [3.45565, 27.1554, 3.86714], [0.0299566, 0.184309, 1.46709]];
+    double [][] convertRGB = {{0.08094444, -0.1305044, 0.116721066}, {-0.010248533514, 0.05401932663599884, -0.11361470821404349}, {-0.0003652969378610491, -0.004121614685876285, 0.6935114048608589}};
+    double [][] convertLMS = {{17.8824, 43.5161, 4.11935}, {3.45565, 27.1554, 3.86714}, {0.0299566, 0.184309, 1.46709}};
 
 
-    double [][] prot = [[0, 2.02344, -2.52581], [0, 1, 0], [0, 0, 1]];
-    double [][] deut = [[1, 0, 0], [0.494207, 0, 1.24827], [0, 0, 1]];
-    double [][] trit = [[1, 0, 0], [0, 1, 0], [-0.395913, 0.801109, 0]];
+    double [][] prot = {{0, 2.02344, -2.52581}, {0, 1, 0}, {0, 0, 1}};
+    double [][] deut = {{1, 0, 0}, {0.494207, 0, 1.24827}, {0, 0, 1}};
+    double [][] trit = {{1, 0, 0}, {0, 1, 0}, {-0.395913, 0.801109, 0}};
 
-    double [][] correction = [[0, 0, 0], [0.7, 1, 0], [0.7, 0, 1]];
+    double [][] correction = {{0, 0, 0}, {0.7, 1, 0}, {0.7, 0, 1}};
 
     public Daltonize(){
         /*initializePrecompute();*/
     }
 
-    public static void initializePrecompute(){
-
-
-        for (int r = 0; r < 255; r++){
-            for (int g = 0; g < 255; g++){
-                for (int b = 0; b < 255; b++){
-
-
-                }
-            }
-        }
-    }
 
     public static double [][] matrixMultiply (double[][] matrix1, double[][] matrix2) {
         int col1 = matrix1[0].length;
@@ -70,9 +58,9 @@ public class Daltonize {
 
 
 
-    public Bitmap  daltonizeImage(Bitmap bmp, int option) {
+    public Bitmap daltonizeImage(Bitmap bmp, int option) {
 
-
+        bmp = bmp.copy(Bitmap.Config.ARGB_8888, true);
         int width = bmp.getWidth();
         int height = bmp.getHeight();
 
@@ -83,19 +71,20 @@ public class Daltonize {
 
         for (int i = 0; i < width; i++){
             for (int j = 0; j < height; j++){
-                Color newColor = bmp.getPixel(0,0);
 
-                current[0][0] = newColor.red();
-                current[1][0] = newColor.green();
-                current[2][0] = newColor.blue();
+                int pixel = bmp.getPixel(i,j);
+
+                current[0][0] = (double) Color.red(pixel);
+                current[1][0] = (double) Color.green(pixel);
+                current[2][0] = (double) Color.blue(pixel);
 
                 current = matrixMultiply(correction, current);
 
-                if (option = 0){
+                if (option == 1){
                     current = matrixMultiply(prot, current);
-                } else if (option = 1){
+                } else if (option == 2){
                     current = matrixMultiply(deut, current);
-                } else if (option = 2){
+                } else if (option == 3){
                     current = matrixMultiply(trit, current);
                 }
 
@@ -108,16 +97,31 @@ public class Daltonize {
                     }
                 }
 
-                Color transformed = new Color((int) current[0][0], (int) current[1][0],(int) current[2][0]);
+//                Color transformed = Color.valueOf((int) current[0][0], (int) current[1][0],(int) current[2][0]);
 
-                int argb = transformed.toArgb();
+//                int argb = transformed.toArgb();
 
-                toReturn.setPixel(i, j, argb);
+                toReturn.setPixel(i, j, Color.rgb((int) current[0][0], (int) current[1][0], (int) current[2][0]));
             }
         }
         return toReturn;
     }
 
+    public static Bitmap bitmapFromArray(int[][] pixels2d){
+        int width = pixels2d.length;
+        int height = pixels2d[0].length;
+        int[] pixels = new int[width * height];
+        int pixelsIndex = 0;
+        for (int i = 0; i < width; i++)
+        {
+            for (int j = 0; j < height; j++)
+            {
+                pixels[pixelsIndex] = pixels2d[i][j];
+                pixelsIndex ++;
+            }
+        }
+        return Bitmap.createBitmap(pixels, width, height, Bitmap.Config.ARGB_8888);
+    }
 
 }
 
