@@ -55,6 +55,58 @@ public class Daltonize {
     }
 
 
+    public Bitmap fixImage(Bitmap original, Bitmap bmp) {
+
+        original = original.copy(Bitmap.Config.ARGB_8888, true);
+        bmp = bmp.copy(Bitmap.Config.ARGB_8888, true);
+
+        int width = bmp.getWidth();
+        int height = bmp.getHeight();
+
+        double errCorrect[][] = {{0, 0, 0}, {0.7, 1, 0}, {0.7, 0, 1}};
+
+        Bitmap toReturn = bmp;
+
+        double [][] current = new double[3][1];
+
+        double temp;
+
+
+        for (int i = 0; i < width; i++){
+            for (int j = 0; j < height; j++){
+
+                int bmppixel = bmp.getPixel(i,j);
+                int originalpixel = original.getPixel(i,j);
+
+
+                current[0][0] = (double) Color.red(originalpixel) - (double) Color.red(bmppixel);
+                current[1][0] = (double) Color.green(originalpixel) - (double) Color.green(bmppixel);
+                current[2][0] = (double) Color.blue(originalpixel) - (double) Color.blue(bmppixel);
+
+                current = matrixMultiply(correction, current);
+
+                current[0][0] = (double) Color.red(originalpixel) + current[0][0];
+                current[1][0] = (double) Color.green(originalpixel) + current[1][0];
+                current[2][0] = (double) Color.blue(originalpixel) + current[2][0];
+
+                for (int k = 0; k < 3; k++){
+                    if (current[k][0] > 252){
+                        current[k][0] = 252;
+                    }
+                    if (current[k][0] < 0){
+                        current[k][0] = 0;
+                    }
+                }
+
+//                Color transformed = Color.valueOf((int) current[0][0], (int) current[1][0],(int) current[2][0]);
+
+//                int argb = transformed.toArgb();
+
+                toReturn.setPixel(i, j, Color.rgb((int) current[0][0], (int) current[1][0], (int) current[2][0]));
+            }
+        }
+        return toReturn;
+    }
 
 
 
@@ -78,7 +130,7 @@ public class Daltonize {
                 current[1][0] = (double) Color.green(pixel);
                 current[2][0] = (double) Color.blue(pixel);
 
-                current = matrixMultiply(correction, current);
+                current = matrixMultiply(convertLMS, current);
 
                 if (option == 1){
                     current = matrixMultiply(prot, current);
@@ -87,6 +139,8 @@ public class Daltonize {
                 } else if (option == 3){
                     current = matrixMultiply(trit, current);
                 }
+
+                current = matrixMultiply(convertRGB,current);
 
                 for (int k = 0; k < 3; k++){
                     if (current[k][0] > 252){
@@ -104,7 +158,7 @@ public class Daltonize {
                 toReturn.setPixel(i, j, Color.rgb((int) current[0][0], (int) current[1][0], (int) current[2][0]));
             }
         }
-        return toReturn;
+        return fixImage(bmp, toReturn);
     }
 
     public static Bitmap bitmapFromArray(int[][] pixels2d){
