@@ -2,6 +2,7 @@ package com.example.fitboyz.thirdeye;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -105,7 +106,9 @@ public class PhotoActivity extends AppCompatActivity {
 
         Daltonize d = new Daltonize();
         Bitmap bitmap = loadBitmap(selectedImagePath);
-        Bitmap newBItmap = d.daltonizeImage(bitmap, typeId);
+        byte[] bArray = bitmapToByte(bitmap);
+        Bitmap b = BitmapFactory.decodeByteArray(bArray, 0, bArray.length);
+        Bitmap newBItmap = d.daltonizeImage(Bitmap.createScaledBitmap(b, 300, 300, false), typeId);
         updateImage(newBItmap);
 
     }
@@ -129,6 +132,7 @@ public class PhotoActivity extends AppCompatActivity {
     }
 
     public void updateImage(Bitmap b) {
+
         Glide.with(this).asBitmap().load(bitmapToByte(b)).into(mMainImage); //>>not tested
     }
 
