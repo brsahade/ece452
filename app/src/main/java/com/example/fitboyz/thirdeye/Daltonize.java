@@ -9,12 +9,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.RelativeLayout;
 
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+
 public class Daltonize {
 
 
-    int [][][] precomputeProtanopia;
-    int [][][] precomputeDeutranopia;
-    int [][][] precomputeTritanopia;
+    static int[][][] precomputeProtanopia;
+//    int[][][] precomputeDeutranopia =  new int[256][256][256];
+//    int[][][] precomputeTritanopia=  new int[256][256][256];
 
     double [][] convertRGB = {{0.08094444, -0.1305044, 0.116721066}, {-0.010248533514, 0.05401932663599884, -0.11361470821404349}, {-0.0003652969378610491, -0.004121614685876285, 0.6935114048608589}};
     double [][] convertLMS = {{17.8824, 43.5161, 4.11935}, {3.45565, 27.1554, 3.86714}, {0.0299566, 0.184309, 1.46709}};
@@ -30,27 +36,41 @@ public class Daltonize {
 
     public Daltonize(){
         /*initializePrecompute();*/
-        initializePrecompute();
+//        initializePrecompute();
     }
 
     public static Daltonize getInstance() {
+        precomputeProtanopia = new int[256][256][256];
         if (instance == null) {
             return new Daltonize();
         }
         return instance;
     }
 
-    public void initializePrecompute() {
+    public void setPrecompute(int[][][] precompute) {
+        precomputeProtanopia = precompute;
+    }
+
+    public int[][][] initializePrecompute() {
+
+
+//        precomputeDeutranopia = new int[256][256][256];
+//        precomputeTritanopia = new int[256][256][256];
+//        precomputeProtanopia = new int[256][256][256];
+
+
         for (int i = 0; i < 256; i++){
             for (int j = 0; j < 256; j++){
                 for (int k = 0; k < 256; k++){
                     precomputeProtanopia[i][j][k] = daltonizeColor((double) i, (double) j, (double) k, 0);
-                    precomputeDeutranopia[i][j][k] = daltonizeColor((double) i, (double) j, (double) k, 1);
-                    precomputeTritanopia[i][j][k] = daltonizeColor((double) i, (double) j, (double) k, 2);
+//                    precomputeDeutranopia[i][j][k] = daltonizeColor((double) i, (double) j, (double) k, 1);
+//                    precomputeTritanopia[i][j][k] = daltonizeColor((double) i, (double) j, (double) k, 2);
 
                 }
             }
         }
+
+        return precomputeProtanopia;
     }
 
     public static double [][] matrixMultiply (double[][] matrix1, double[][] matrix2) {
@@ -89,17 +109,17 @@ public class Daltonize {
             for (int j = 0; j < height; j++){
                 int pixel = bmp.getPixel(i,j);
                 int color = 0;
-                if (option == 0){
+//                if (option == 0){
                     color = precomputeProtanopia[Color.red(pixel)][Color.green(pixel)][Color.blue(pixel)];
-                } else if (option == 1){
-                    color = precomputeDeutranopia[Color.red(pixel)][Color.green(pixel)][Color.blue(pixel)];
-                } else if (option == 2) {
-                    color = precomputeTritanopia[Color.red(pixel)][Color.green(pixel)][Color.blue(pixel)];
-                }
+//                } else if (option == 1){
+//                    color = precomputeDeutranopia[Color.red(pixel)][Color.green(pixel)][Color.blue(pixel)];
+//                } else if (option == 2) {
+//                    color = precomputeTritanopia[Color.red(pixel)][Color.green(pixel)][Color.blue(pixel)];
+//                }
                 toReturn.setPixel(i, j, color);
             }
         }
-        return toReturn;
+            return toReturn;
     }
 
     public int daltonizeColor(double red, double green, double blue, int option) {

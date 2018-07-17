@@ -120,10 +120,10 @@ public class PhotoActivity extends AppCompatActivity {
                 mProgressBar.setVisibility(View.VISIBLE);
             }
         });
-        final Daltonize d = new Daltonize();
+        final Daltonize d = Daltonize.getInstance();
         final Bitmap bitmap = loadBitmap(selectedImagePath);
 //        mProgressBar.setVisibility(View.VISIBLE);
-
+//
 //        byte[] bArray = bitmapToByte(bitmap);
 //        Bitmap b = BitmapFactory.decodeByteArray(bArray, 0, bArray.length);
 //        Bitmap newBItmap = d.daltonizeImage(Bitmap.createScaledBitmap(bitmap, 500, 500, false), typeId);
