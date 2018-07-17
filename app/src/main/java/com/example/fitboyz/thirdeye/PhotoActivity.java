@@ -126,8 +126,6 @@ public class PhotoActivity extends AppCompatActivity {
             }
         });
 
-        final Daltonize d = new Daltonize();
-        loadBitmap(selectedImagePath);
 //        mProgressBar.setVisibility(View.VISIBLE);
 
 //        byte[] bArray = bitmapToByte(bitmap);
@@ -138,6 +136,7 @@ public class PhotoActivity extends AppCompatActivity {
 
             public void run(){
                 photo.computeDalonization(typeId);
+                pm.add(photo.getId(), photo);
 
                 runOnUiThread(new Runnable() {
                     @Override
@@ -170,7 +169,7 @@ public class PhotoActivity extends AppCompatActivity {
                 String id = UUID.randomUUID().toString();
 
                 photo = new Photo(id, selectedImagePath, width, height);
-                pm.add(id, photo);
+                photo.setPhotoOriginal(loadBitmap(selectedImagePath));
 
                 Glide.with(this).load(photo.getUri()).into(mMainImage);
 
@@ -185,17 +184,18 @@ public class PhotoActivity extends AppCompatActivity {
         return byteArray;
     }
 
-    public void loadBitmap(Uri url)
+    public Bitmap loadBitmap(Uri url)
     {
         Bitmap bitmap = null;
 
         try {
             bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), url);
+            return bitmap;
         } catch (Exception e) {
             e.fillInStackTrace();
         }
 
-        photo.setPhotoOriginal(bitmap);
+        return bitmap;
     }
 
 }

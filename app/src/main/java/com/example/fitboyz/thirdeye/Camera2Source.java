@@ -356,6 +356,9 @@ public class Camera2Source {
                 return;
             }
 
+            saveImage = mImage;
+
+
 
             mFrameProcessor.setNextFrame(convertYUV420888ToNV21(mImage));
             mImage.close();
@@ -702,9 +705,11 @@ public class Camera2Source {
      * while the picture is being taken, but will resume once picture taking is done.
      */
     public void takePicture(ShutterCallback shutter, PictureCallback picCallback) {
-        mShutterCallback = shutter;
-        mOnImageAvailableListener.mDelegate = picCallback;
-        lockFocus();
+
+
+//        mShutterCallback = shutter;
+//        mOnImageAvailableListener.mDelegate = picCallback;
+//        lockFocus();
     }
 
     public void recordVideo(VideoStartCallback videoStartCallback, VideoStopCallback videoStopCallback, VideoErrorCallback videoErrorCallback) {
