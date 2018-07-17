@@ -1296,7 +1296,7 @@ public class Camera2Source {
                     mPendingFrameData = null;
                 }
 
-                // Timestamp and frame ID are maintained here, which will give downstream code some
+                // Timestampk and frame ID are maintained here, which will give downstream code some
                 // idea of the timing of frames received and when frames were dropped along the way.
                 mPendingTimeMillis = SystemClock.elapsedRealtime() - mStartTimeMillis;
                 mPendingFrameId++;

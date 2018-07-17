@@ -4,18 +4,25 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import com.bumptech.glide.Glide;
 
 import java.io.ByteArrayOutputStream;
+import java.lang.annotation.Target;
+
+import javax.sql.DataSource;
 
 public class PhotoActivity extends AppCompatActivity {
 
@@ -27,6 +34,7 @@ public class PhotoActivity extends AppCompatActivity {
     private ImageView mMainImage;
     private LinearLayout mTypeOne, mTypeTwo, mTypeThree;
     private Button mButton;
+    private ProgressBar mProgressBar;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,8 +100,11 @@ public class PhotoActivity extends AppCompatActivity {
             }
         });
 
+        mProgressBar = (ProgressBar)findViewById(R.id.progress_bar);
         // in onCreate or any event where your want the user to
         // select a file
+
+
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -102,14 +113,44 @@ public class PhotoActivity extends AppCompatActivity {
 
     }
 
-    public void daltonization(int typeId) {
+    public void daltonization(final int typeId) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mProgressBar.setVisibility(View.VISIBLE);
+            }
+        });
+        final Daltonize d = new Daltonize();
+        final Bitmap bitmap = loadBitmap(selectedImagePath);
+//        mProgressBar.setVisibility(View.VISIBLE);
 
-        Daltonize d = new Daltonize();
-        Bitmap bitmap = loadBitmap(selectedImagePath);
 //        byte[] bArray = bitmapToByte(bitmap);
 //        Bitmap b = BitmapFactory.decodeByteArray(bArray, 0, bArray.length);
 //        Bitmap newBItmap = d.daltonizeImage(Bitmap.createScaledBitmap(bitmap, 500, 500, false), typeId);
-        updateImage(d.daltonizeImage(bitmap, typeId));
+
+        Runnable myRunnable = new Runnable(){
+
+            public void run(){
+                final Bitmap bitmapNew = d.daltonizeImage(bitmap, typeId);
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mProgressBar.setVisibility(View.INVISIBLE);
+                        Glide.with(PhotoActivity.this).asBitmap().load(bitmapToByte(bitmapNew))
+                                .into(mMainImage);
+                    }
+                });
+
+            }
+        };
+
+        Thread thread = new Thread(myRunnable);
+        thread.start();
+
+
+//        mProgressBar.setVisibility(View.VISIBLE);
+
 
     }
 
@@ -131,10 +172,7 @@ public class PhotoActivity extends AppCompatActivity {
         return byteArray;
     }
 
-    public void updateImage(Bitmap b) {
 
-        Glide.with(this).asBitmap().load(bitmapToByte(b)).into(mMainImage); //>>not tested
-    }
 
     public Bitmap loadBitmap(Uri url)
     {

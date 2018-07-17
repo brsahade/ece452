@@ -12,9 +12,9 @@ import android.widget.RelativeLayout;
 public class Daltonize {
 
 
-    Color [][][] precomputeProtanopia;
-    Color [][][] precomputeDeutranopia;
-    Color [][][] precomputeTritanopia;
+    int [][][] precomputeProtanopia;
+    int [][][] precomputeDeutranopia;
+    int [][][] precomputeTritanopia;
 
     double [][] convertRGB = {{0.08094444, -0.1305044, 0.116721066}, {-0.010248533514, 0.05401932663599884, -0.11361470821404349}, {-0.0003652969378610491, -0.004121614685876285, 0.6935114048608589}};
     double [][] convertLMS = {{17.8824, 43.5161, 4.11935}, {3.45565, 27.1554, 3.86714}, {0.0299566, 0.184309, 1.46709}};
@@ -26,10 +26,32 @@ public class Daltonize {
 
     double [][] correction = {{0, 0, 0}, {0.7, 1, 0}, {0.7, 0, 1}};
 
+    private static Daltonize instance = null;
+
     public Daltonize(){
         /*initializePrecompute();*/
+        initializePrecompute();
     }
 
+    public static Daltonize getInstance() {
+        if (instance == null) {
+            return new Daltonize();
+        }
+        return instance;
+    }
+
+    public void initializePrecompute() {
+        for (int i = 0; i < 256; i++){
+            for (int j = 0; j < 256; j++){
+                for (int k = 0; k < 256; k++){
+                    precomputeProtanopia[i][j][k] = daltonizeColor((double) i, (double) j, (double) k, 0);
+                    precomputeDeutranopia[i][j][k] = daltonizeColor((double) i, (double) j, (double) k, 1);
+                    precomputeTritanopia[i][j][k] = daltonizeColor((double) i, (double) j, (double) k, 2);
+
+                }
+            }
+        }
+    }
 
     public static double [][] matrixMultiply (double[][] matrix1, double[][] matrix2) {
         int col1 = matrix1[0].length;
@@ -55,61 +77,6 @@ public class Daltonize {
     }
 
 
-    public Bitmap fixImage(Bitmap original, Bitmap bmp) {
-
-        original = original.copy(Bitmap.Config.ARGB_8888, true);
-        bmp = bmp.copy(Bitmap.Config.ARGB_8888, true);
-
-        int width = bmp.getWidth();
-        int height = bmp.getHeight();
-
-        double errCorrect[][] = {{0, 0, 0}, {0.7, 1, 0}, {0.7, 0, 1}};
-
-        Bitmap toReturn = bmp;
-
-        double [][] current = new double[3][1];
-
-        double temp;
-
-
-        for (int i = 0; i < width; i++){
-            for (int j = 0; j < height; j++){
-
-                int bmppixel = bmp.getPixel(i,j);
-                int originalpixel = original.getPixel(i,j);
-
-
-                current[0][0] = (double) Color.red(originalpixel) - (double) Color.red(bmppixel);
-                current[1][0] = (double) Color.green(originalpixel) - (double) Color.green(bmppixel);
-                current[2][0] = (double) Color.blue(originalpixel) - (double) Color.blue(bmppixel);
-
-                current = matrixMultiply(correction, current);
-
-                current[0][0] = (double) Color.red(originalpixel) + current[0][0];
-                current[1][0] = (double) Color.green(originalpixel) + current[1][0];
-                current[2][0] = (double) Color.blue(originalpixel) + current[2][0];
-
-                for (int k = 0; k < 3; k++){
-                    if (current[k][0] > 252){
-                        current[k][0] = 252;
-                    }
-                    if (current[k][0] < 0){
-                        current[k][0] = 0;
-                    }
-                }
-
-//                Color transformed = Color.valueOf((int) current[0][0], (int) current[1][0],(int) current[2][0]);
-
-//                int argb = transformed.toArgb();
-
-                toReturn.setPixel(i, j, Color.rgb((int) current[0][0], (int) current[1][0], (int) current[2][0]));
-            }
-        }
-        return toReturn;
-    }
-
-
-
     public Bitmap daltonizeImage(Bitmap bmp, int option) {
 
         bmp = bmp.copy(Bitmap.Config.ARGB_8888, true);
@@ -118,47 +85,72 @@ public class Daltonize {
 
         Bitmap toReturn = bmp;
 
-        double [][] current = new double[3][1];
-
-
         for (int i = 0; i < width; i++){
             for (int j = 0; j < height; j++){
-
                 int pixel = bmp.getPixel(i,j);
-
-                current[0][0] = (double) Color.red(pixel);
-                current[1][0] = (double) Color.green(pixel);
-                current[2][0] = (double) Color.blue(pixel);
-
-                current = matrixMultiply(convertLMS, current);
-
-                if (option == 1){
-                    current = matrixMultiply(prot, current);
-                } else if (option == 2){
-                    current = matrixMultiply(deut, current);
-                } else if (option == 3){
-                    current = matrixMultiply(trit, current);
+                int color = 0;
+                if (option == 0){
+                    color = precomputeProtanopia[Color.red(pixel)][Color.green(pixel)][Color.blue(pixel)];
+                } else if (option == 1){
+                    color = precomputeDeutranopia[Color.red(pixel)][Color.green(pixel)][Color.blue(pixel)];
+                } else if (option == 2) {
+                    color = precomputeTritanopia[Color.red(pixel)][Color.green(pixel)][Color.blue(pixel)];
                 }
-
-                current = matrixMultiply(convertRGB,current);
-
-                for (int k = 0; k < 3; k++){
-                    if (current[k][0] > 252){
-                        current[k][0] = 252;
-                    }
-                    if (current[k][0] < 0){
-                        current[k][0] = 0;
-                    }
-                }
-
-//                Color transformed = Color.valueOf((int) current[0][0], (int) current[1][0],(int) current[2][0]);
-
-//                int argb = transformed.toArgb();
-
-                toReturn.setPixel(i, j, Color.rgb((int) current[0][0], (int) current[1][0], (int) current[2][0]));
+                toReturn.setPixel(i, j, color);
             }
         }
-        return fixImage(bmp, toReturn);
+        return toReturn;
+    }
+
+    public int daltonizeColor(double red, double green, double blue, int option) {
+
+        double [][] current = new double[3][1];
+        current[0][0] = red;
+        current[1][0] = green;
+        current[2][0] = blue;
+
+        current = matrixMultiply(convertLMS, current);
+
+        if (option == 1){
+            current = matrixMultiply(prot, current);
+        } else if (option == 2){
+            current = matrixMultiply(deut, current);
+        } else if (option == 3){
+            current = matrixMultiply(trit, current);
+        }
+
+        current = matrixMultiply(convertRGB,current);
+
+        for (int k = 0; k < 3; k++){
+            if (current[k][0] > 252){
+                current[k][0] = 252;
+            }
+            if (current[k][0] < 0){
+                current[k][0] = 0;
+            }
+        }
+
+        current[0][0] = red - current[0][0];
+        current[1][0] = green - current[1][0];
+        current[2][0] = blue - current[2][0];
+
+        current = matrixMultiply(correction, current);
+
+        current[0][0] = red + current[0][0];
+        current[1][0] = green + current[1][0];
+        current[2][0] = blue + current[2][0];
+
+        for (int k = 0; k < 3; k++){
+            if (current[k][0] > 252){
+                current[k][0] = 252;
+            }
+            if (current[k][0] < 0){
+                current[k][0] = 0;
+            }
+        }
+
+        return Color.rgb((int) current[0][0], (int) current[1][0], (int) current[2][0]);
+
     }
 
     public static Bitmap bitmapFromArray(int[][] pixels2d){
@@ -178,19 +170,3 @@ public class Daltonize {
     }
 
 }
-
-/*
-
-current[0][0] = current[0][0] + newColor.R;
-                current[1][0] = current[1][0] + newColor.G;
-                current[2][0] = current[2][0] + newColor.B;
-
-                for (int k = 0; k < 3; k++){
-                    if (current[k][0] > 252){
-                        current[k][0] = 252;
-                    }
-                    if (current[k][0] < 0){
-                        current[k][0] = 0;
-                    }
-                }
- */
