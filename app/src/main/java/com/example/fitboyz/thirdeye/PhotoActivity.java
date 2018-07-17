@@ -20,9 +20,12 @@ import android.widget.ProgressBar;
 import com.bumptech.glide.Glide;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.lang.annotation.Target;
+import java.util.UUID;
 
-import javax.sql.DataSource;
+import com.example.fitboyz.thirdeye.Photo;
+import com.example.fitboyz.thirdeye.PhotoManager;
 
 public class PhotoActivity extends AppCompatActivity {
 
@@ -35,8 +38,11 @@ public class PhotoActivity extends AppCompatActivity {
     private LinearLayout mTypeOne, mTypeTwo, mTypeThree;
     private Button mButton;
     private ProgressBar mProgressBar;
+    private Photo photo;
+    private PhotoManager pm;
 
     public void onCreate(Bundle savedInstanceState) {
+        pm = PhotoManager.getInstance();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo);
 
@@ -104,7 +110,6 @@ public class PhotoActivity extends AppCompatActivity {
         // in onCreate or any event where your want the user to
         // select a file
 
-
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -120,8 +125,12 @@ public class PhotoActivity extends AppCompatActivity {
                 mProgressBar.setVisibility(View.VISIBLE);
             }
         });
-        final Daltonize d = Daltonize.getInstance();
-        final Bitmap bitmap = loadBitmap(selectedImagePath);
+
+
+        final Daltonize d = new Daltonize();
+        loadBitmap(selectedImagePath);
+
+
 //        mProgressBar.setVisibility(View.VISIBLE);
 //
 //        byte[] bArray = bitmapToByte(bitmap);
@@ -131,13 +140,13 @@ public class PhotoActivity extends AppCompatActivity {
         Runnable myRunnable = new Runnable(){
 
             public void run(){
-                final Bitmap bitmapNew = d.daltonizeImage(bitmap, typeId);
+                photo.computeDalonization(typeId);
 
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         mProgressBar.setVisibility(View.INVISIBLE);
-                        Glide.with(PhotoActivity.this).asBitmap().load(bitmapToByte(bitmapNew))
+                        Glide.with(PhotoActivity.this).asBitmap().load(bitmapToByte(photo.getPhotoDaltonized()))
                                 .into(mMainImage);
                     }
                 });
@@ -148,18 +157,25 @@ public class PhotoActivity extends AppCompatActivity {
         Thread thread = new Thread(myRunnable);
         thread.start();
 
-
 //        mProgressBar.setVisibility(View.VISIBLE);
-
-
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             if (requestCode == SELECT_PICTURE) {
-                Uri selectedImageUri = data.getData();
-                selectedImagePath = selectedImageUri;
-                Glide.with(this).load(selectedImagePath).into(mMainImage);
+                selectedImagePath = data.getData();
+
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inJustDecodeBounds = true;
+                BitmapFactory.decodeFile(new File(selectedImagePath.getPath()).getAbsolutePath(), options);
+                int height = options.outHeight;
+                int width = options.outWidth;
+                String id = UUID.randomUUID().toString();
+
+                photo = new Photo(id, selectedImagePath, width, height);
+                pm.add(id, photo);
+
+                Glide.with(this).load(photo.getUri()).into(mMainImage);
 
             }
         }
@@ -172,18 +188,17 @@ public class PhotoActivity extends AppCompatActivity {
         return byteArray;
     }
 
-
-
-    public Bitmap loadBitmap(Uri url)
+    public void loadBitmap(Uri url)
     {
         Bitmap bitmap = null;
+
         try {
             bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), url);
-            return bitmap;
         } catch (Exception e) {
             e.fillInStackTrace();
         }
-        return bitmap;
+
+        photo.setPhotoOriginal(bitmap);
     }
 
 }
