@@ -125,7 +125,6 @@ public class PhotoActivity extends AppCompatActivity {
                 mProgressBar.setVisibility(View.VISIBLE);
             }
         });
-
 //        mProgressBar.setVisibility(View.VISIBLE);
 
 //        byte[] bArray = bitmapToByte(bitmap);
