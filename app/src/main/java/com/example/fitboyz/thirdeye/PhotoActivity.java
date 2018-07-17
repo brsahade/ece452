@@ -134,14 +134,14 @@ public class PhotoActivity extends AppCompatActivity {
         Runnable myRunnable = new Runnable(){
 
             public void run(){
-                photo.computeDalonization(typeId);
-                pm.add(photo.getId(), photo);
+                Daltonize d = new Daltonize();
+                final Bitmap daltonizedBitmap = d.daltonizeImage(loadBitmap(photo.getUri()), typeId);
 
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         mProgressBar.setVisibility(View.INVISIBLE);
-                        Glide.with(PhotoActivity.this).asBitmap().load(bitmapToByte(photo.getPhotoDaltonized()))
+                        Glide.with(PhotoActivity.this).asBitmap().load(bitmapToByte(daltonizedBitmap))
                                 .into(mMainImage);
                     }
                 });
@@ -159,16 +159,17 @@ public class PhotoActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK) {
             if (requestCode == SELECT_PICTURE) {
                 selectedImagePath = data.getData();
+                Bitmap bitmap = loadBitmap(selectedImagePath);
 
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inJustDecodeBounds = true;
-                BitmapFactory.decodeFile(new File(selectedImagePath.getPath()).getAbsolutePath(), options);
-                int height = options.outHeight;
-                int width = options.outWidth;
+//                BitmapFactory.Options options = new BitmapFactory.Options();
+//                options.inJustDecodeBounds = true;
+//                BitmapFactory.decodeFile(new File(selectedImagePath.getPath()).getAbsolutePath(), options);
+                int height = bitmap.getHeight();
+                int width = bitmap.getWidth();
                 String id = UUID.randomUUID().toString();
 
                 photo = new Photo(id, selectedImagePath, width, height);
-                photo.setPhotoOriginal(loadBitmap(selectedImagePath));
+                pm.add(id, photo);
 
                 Glide.with(this).load(photo.getUri()).into(mMainImage);
 

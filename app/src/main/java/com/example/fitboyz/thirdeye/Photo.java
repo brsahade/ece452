@@ -10,8 +10,8 @@ public class Photo {
     private Uri uri;
     private int width;
     private int height;
-    private Bitmap photoOriginal;
-    private Bitmap photoDaltonized;
+//    private Bitmap photoOriginal;
+//    private Bitmap photoDaltonized;
 
     Photo(String id, Uri uri, int width, int height) {
         this.id = id;
@@ -36,24 +36,24 @@ public class Photo {
         return this.height;
     }
 
-    public void setPhotoOriginal(Bitmap photoOriginal) {
-        this.photoOriginal = photoOriginal;
-    }
-
-    public Bitmap getPhotoOriginal() {
-        return this.photoOriginal;
-    }
-
-    public void setPhotoDaltonized(Bitmap photoDaltonized) {
-        this.photoDaltonized = photoDaltonized;
-    }
-
-    public Bitmap getPhotoDaltonized() {
-        return this.photoDaltonized;
-    }
-
-    public void computeDalonization(int typeId) {
-        Daltonize d = new Daltonize();
-        this.photoDaltonized = d.daltonizeImage(getPhotoOriginal(), typeId);
-    }
+//    public void setPhotoOriginal(Bitmap photoOriginal) {
+//        this.photoOriginal = photoOriginal;
+//    }
+//
+//    public Bitmap getPhotoOriginal() {
+//        return this.photoOriginal;
+//    }
+//
+//    public void setPhotoDaltonized(Bitmap photoDaltonized) {
+//        this.photoDaltonized = photoDaltonized;
+//    }
+//
+//    public Bitmap getPhotoDaltonized() {
+//        return this.photoDaltonized;
+//    }
+//
+//    public void computeDalonization(int typeId) {
+//        Daltonize d = new Daltonize();
+//        this.photoDaltonized = d.daltonizeImage(this.photoOriginal, typeId);
+//    }
 }

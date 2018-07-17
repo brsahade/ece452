@@ -104,6 +104,7 @@ public class Camera2Source {
     private static final SparseIntArray INVERSE_ORIENTATIONS = new SparseIntArray();
     private boolean cameraStarted = false;
     private int mSensorOrientation;
+    private Image saveImage;
 
     /**
      * A reference to the opened {@link CameraDevice}.
@@ -357,8 +358,6 @@ public class Camera2Source {
             }
 
             saveImage = mImage;
-
-
 
             mFrameProcessor.setNextFrame(convertYUV420888ToNV21(mImage));
             mImage.close();
@@ -705,7 +704,6 @@ public class Camera2Source {
      * while the picture is being taken, but will resume once picture taking is done.
      */
     public void takePicture(ShutterCallback shutter, PictureCallback picCallback) {
-
 
 //        mShutterCallback = shutter;
 //        mOnImageAvailableListener.mDelegate = picCallback;
