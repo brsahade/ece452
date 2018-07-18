@@ -113,7 +113,7 @@ public class Daltonize {
                 int color = 0;
 //                if (option == 0){
 //                    color = precomputeProtanopia[Color.red(pixel)][Color.green(pixel)][Color.blue(pixel)];
-                color = daltonizeColor(Color.red(pixel), Color.green(pixel), Color.blue(pixel), 1);
+                    color = daltonizeColor(Color.red(pixel), Color.green(pixel), Color.blue(pixel), 1);
 
 //                } else if (option == 1){
 //                    color = precomputeDeutranopia[Color.red(pixel)][Color.green(pixel)][Color.blue(pixel)];

@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
         
         requestPermissionThenOpenCamera();
-        read();
+//        read();
 
 
 //        if (!read()) {
@@ -75,9 +75,9 @@ public class MainActivity extends AppCompatActivity {
     private void requestPermissionThenOpenCamera() {
         if(ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
             if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                if (!read()) {
-                    write();
-                }
+//                if (!read()) {
+//                    write();
+//                }
             } else {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_STORAGE_PERMISSION);
             }
