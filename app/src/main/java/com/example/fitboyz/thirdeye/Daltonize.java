@@ -51,27 +51,7 @@ public class Daltonize {
         precomputeProtanopia = precompute;
     }
 
-    public int[][][] initializePrecompute() {
 
-
-//        precomputeDeutranopia = new int[256][256][256];
-//        precomputeTritanopia = new int[256][256][256];
-//        precomputeProtanopia = new int[256][256][256];
-
-
-        for (int i = 0; i < 256; i++){
-            for (int j = 0; j < 256; j++){
-                for (int k = 0; k < 256; k++){
-                    precomputeProtanopia[i][j][k] = daltonizeColor((double) i, (double) j, (double) k, 0);
-//                    precomputeDeutranopia[i][j][k] = daltonizeColor((double) i, (double) j, (double) k, 1);
-//                    precomputeTritanopia[i][j][k] = daltonizeColor((double) i, (double) j, (double) k, 2);
-
-                }
-            }
-        }
-
-        return precomputeProtanopia;
-    }
 
     public static double [][] matrixMultiply (double[][] matrix1, double[][] matrix2) {
         int col1 = matrix1[0].length;
@@ -97,6 +77,28 @@ public class Daltonize {
     }
 
 
+    public int[][][] initializePrecompute() {
+
+
+//        precomputeDeutranopia = new int[256][256][256];
+//        precomputeTritanopia = new int[256][256][256];
+//        precomputeProtanopia = new int[256][256][256];
+
+
+        for (int i = 0; i < 256; i++){
+            for (int j = 0; j < 256; j++){
+                for (int k = 0; k < 256; k++){
+                    precomputeProtanopia[i][j][k] = daltonizeColor((double) i, (double) j, (double) k, 1);
+//                    precomputeDeutranopia[i][j][k] = daltonizeColor((double) i, (double) j, (double) k, 1);
+//                    precomputeTritanopia[i][j][k] = daltonizeColor((double) i, (double) j, (double) k, 2);
+
+                }
+            }
+        }
+
+        return precomputeProtanopia;
+    }
+
     public Bitmap daltonizeImage(Bitmap bmp, int option) {
 
         bmp = bmp.copy(Bitmap.Config.ARGB_8888, true);
@@ -111,6 +113,8 @@ public class Daltonize {
                 int color = 0;
 //                if (option == 0){
                     color = precomputeProtanopia[Color.red(pixel)][Color.green(pixel)][Color.blue(pixel)];
+//                color = daltonizeColor(Color.red(pixel), Color.green(pixel), Color.blue(pixel), 1);
+
 //                } else if (option == 1){
 //                    color = precomputeDeutranopia[Color.red(pixel)][Color.green(pixel)][Color.blue(pixel)];
 //                } else if (option == 2) {
@@ -131,13 +135,13 @@ public class Daltonize {
 
         current = matrixMultiply(convertLMS, current);
 
-        if (option == 1){
+//        if (option == 1){
             current = matrixMultiply(prot, current);
-        } else if (option == 2){
-            current = matrixMultiply(deut, current);
-        } else if (option == 3){
-            current = matrixMultiply(trit, current);
-        }
+//        } else if (option == 2){
+//            current = matrixMultiply(deut, current);
+//        } else if (option == 3){
+//            current = matrixMultiply(trit, current);
+//        }
 
         current = matrixMultiply(convertRGB,current);
 

@@ -57,10 +57,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+        read();
         //requestPermissionThenOpenCamera();
 
 //        if (!read()) {
-////            int[][][] precomputedData = Daltonize.getInstance().initializePrecompute();
+//            int[][][] precomputedData = Daltonize.getInstance().initializePrecompute();
+//            write();
+//        }
+//        else {
 //            write();
 //        }
 
