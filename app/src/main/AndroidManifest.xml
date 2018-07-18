@@ -27,6 +27,10 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".ScreenSlidePagerActivity" android:theme="@style/generalnotitle">
+
+        </activity>
+
         <activity android:name=".PhotoActivity">
 
         </activity>
