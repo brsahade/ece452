@@ -367,8 +367,7 @@ public class Camera2Source {
                 return;
             }
 
-            saveImage = mImage;
-
+//            saveImage = mImage;
             mFrameProcessor.setNextFrame(convertYUV420888ToNV21(mImage));
             mImage.close();
         }
@@ -714,96 +713,20 @@ public class Camera2Source {
      * while the picture is being taken, but will resume once picture taking is done.
      */
     public void takePicture(ShutterCallback shutter, PictureCallback picCallback) {
-        pm = PhotoManager.getInstance();
 
-        Runnable myRunnable = new Runnable(){
+//        ImageReader imageReader = saveImage;
+//        Image img = saveImage;
+//                BufferedImage copyOfImage =
+//                new BufferedImage(widthOfImage, heightOfImage, BufferedImage.TYPE_INT_RGB);
+//        Graphics g = copyOfImage.createGraphics();
+//        g.drawImage(originalImage, 0, 0, null);
+//        picCallback.onPictureTaken(img);
 
-            public void run(){
-                // convert image to bitmap
-                ByteBuffer buffer = saveImage.getPlanes()[0].getBuffer();
-                byte[] bytes = new byte[buffer.capacity()];
-                buffer.get(bytes);
-                Bitmap bitmapImage = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
+        mShutterCallback = shutter;
+        mOnImageAvailableListener.mDelegate = picCallback;
+        lockFocus();
 
-                Daltonize d = new Daltonize();
-                final Bitmap daltonizedBitmap = d.daltonizeImage(bitmapImage, 1);
-
-                // save the bitmap to local storage
-                ContextWrapper cw = new ContextWrapper(mContext);
-                File directory = cw.getDir("ThirdEye", Context.MODE_PRIVATE);
-                File mypath = new File(directory, UUID.randomUUID().toString());
-
-                FileOutputStream fos = null;
-                try {
-                    fos = new FileOutputStream(mypath);
-                    // Use the compress method on the BitMap object to write image to the OutputStream
-                    daltonizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    try {
-                        fos.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                // add the daltonized image to PhotoManager
-                Uri uri = Uri.fromFile(mypath);
-                String id = UUID.randomUUID().toString();
-                Photo photo = new Photo(id, uri, daltonizedBitmap.getWidth(), daltonizedBitmap.getHeight());
-                pm.add(id, photo);
-            }
-        };
-
-        Thread thread = new Thread(myRunnable);
-        thread.start();
-
-//        mShutterCallback = shutter;
 //        mOnImageAvailableListener.mDelegate = picCallback;
-//        lockFocus();
-    }
-
-    public void recordVideo(VideoStartCallback videoStartCallback, VideoStopCallback videoStopCallback, VideoErrorCallback videoErrorCallback) {
-        try {
-            this.videoStartCallback = videoStartCallback;
-            this.videoStopCallback = videoStopCallback;
-            this.videoErrorCallback = videoErrorCallback;
-            if(mCameraDevice == null || !mTextureView.isAvailable() || mPreviewSize == null){
-                this.videoErrorCallback.onVideoError("Camera not ready.");
-                return;
-            }
-            videoFile = Environment.getExternalStorageDirectory() + "/" + formatter.format(new Date()) + ".mp4";
-            mMediaRecorder = new MediaRecorder();
-            //mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-            mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
-            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-            mMediaRecorder.setOutputFile(videoFile);
-            mMediaRecorder.setVideoEncodingBitRate(10000000);
-            mMediaRecorder.setVideoFrameRate(30);
-            mMediaRecorder.setVideoSize(mVideoSize.getWidth(), mVideoSize.getHeight());
-            mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
-            //mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-            if(swappedDimensions) {
-                mMediaRecorder.setOrientationHint(INVERSE_ORIENTATIONS.get(mDisplayOrientation));
-            } else {
-                mMediaRecorder.setOrientationHint(ORIENTATIONS.get(mDisplayOrientation));
-            }
-            mMediaRecorder.prepare();
-            closePreviewSession();
-            createCameraRecordSession();
-        } catch(IOException ex) {
-            Log.d(TAG, ex.getMessage());
-        }
-    }
-
-    public void stopVideo() {
-        //Stop recording
-        mMediaRecorder.stop();
-        mMediaRecorder.reset();
-        videoStopCallback.onVideoStop(videoFile);
-        closePreviewSession();
-        createCameraPreviewSession();
     }
 
     private Size getBestAspectPictureSize(android.util.Size[] supportedPictureSizes) {
