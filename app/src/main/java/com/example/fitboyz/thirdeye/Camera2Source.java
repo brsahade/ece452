@@ -4,8 +4,11 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.Point;
@@ -28,6 +31,7 @@ import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
 import android.media.MediaRecorder;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
@@ -42,12 +46,16 @@ import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.MotionEvent;
 import android.view.Surface;
+import android.view.View;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.common.images.Size;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.Frame;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.Thread.State;
 import java.lang.annotation.Retention;
@@ -63,6 +71,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.UUID;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -105,6 +114,7 @@ public class Camera2Source {
     private boolean cameraStarted = false;
     private int mSensorOrientation;
     private Image saveImage;
+    private PhotoManager pm;
 
     /**
      * A reference to the opened {@link CameraDevice}.
@@ -704,6 +714,50 @@ public class Camera2Source {
      * while the picture is being taken, but will resume once picture taking is done.
      */
     public void takePicture(ShutterCallback shutter, PictureCallback picCallback) {
+        pm = PhotoManager.getInstance();
+
+        Runnable myRunnable = new Runnable(){
+
+            public void run(){
+                // convert image to bitmap
+                ByteBuffer buffer = saveImage.getPlanes()[0].getBuffer();
+                byte[] bytes = new byte[buffer.capacity()];
+                buffer.get(bytes);
+                Bitmap bitmapImage = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
+
+                Daltonize d = new Daltonize();
+                final Bitmap daltonizedBitmap = d.daltonizeImage(bitmapImage, 1);
+
+                // save the bitmap to local storage
+                ContextWrapper cw = new ContextWrapper(mContext);
+                File directory = cw.getDir("ThirdEye", Context.MODE_PRIVATE);
+                File mypath = new File(directory, UUID.randomUUID().toString());
+
+                FileOutputStream fos = null;
+                try {
+                    fos = new FileOutputStream(mypath);
+                    // Use the compress method on the BitMap object to write image to the OutputStream
+                    daltonizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        fos.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                // add the daltonized image to PhotoManager
+                Uri uri = Uri.fromFile(mypath);
+                String id = UUID.randomUUID().toString();
+                Photo photo = new Photo(id, uri, daltonizedBitmap.getWidth(), daltonizedBitmap.getHeight());
+                pm.add(id, photo);
+            }
+        };
+
+        Thread thread = new Thread(myRunnable);
+        thread.start();
 
 //        mShutterCallback = shutter;
 //        mOnImageAvailableListener.mDelegate = picCallback;
