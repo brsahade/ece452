@@ -125,14 +125,8 @@ public class PhotoActivity extends AppCompatActivity {
                 mProgressBar.setVisibility(View.VISIBLE);
             }
         });
-
-
-        final Daltonize d = new Daltonize();
-        loadBitmap(selectedImagePath);
-
-
 //        mProgressBar.setVisibility(View.VISIBLE);
-//
+
 //        byte[] bArray = bitmapToByte(bitmap);
 //        Bitmap b = BitmapFactory.decodeByteArray(bArray, 0, bArray.length);
 //        Bitmap newBItmap = d.daltonizeImage(Bitmap.createScaledBitmap(bitmap, 500, 500, false), typeId);
@@ -140,13 +134,14 @@ public class PhotoActivity extends AppCompatActivity {
         Runnable myRunnable = new Runnable(){
 
             public void run(){
-                photo.computeDalonization(typeId);
+                Daltonize d = new Daltonize();
+                final Bitmap daltonizedBitmap = d.daltonizeImage(loadBitmap(photo.getUri()), typeId);
 
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         mProgressBar.setVisibility(View.INVISIBLE);
-                        Glide.with(PhotoActivity.this).asBitmap().load(bitmapToByte(photo.getPhotoDaltonized()))
+                        Glide.with(PhotoActivity.this).asBitmap().load(bitmapToByte(daltonizedBitmap))
                                 .into(mMainImage);
                     }
                 });
@@ -164,12 +159,13 @@ public class PhotoActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK) {
             if (requestCode == SELECT_PICTURE) {
                 selectedImagePath = data.getData();
+                Bitmap bitmap = loadBitmap(selectedImagePath);
 
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inJustDecodeBounds = true;
-                BitmapFactory.decodeFile(new File(selectedImagePath.getPath()).getAbsolutePath(), options);
-                int height = options.outHeight;
-                int width = options.outWidth;
+//                BitmapFactory.Options options = new BitmapFactory.Options();
+//                options.inJustDecodeBounds = true;
+//                BitmapFactory.decodeFile(new File(selectedImagePath.getPath()).getAbsolutePath(), options);
+                int height = bitmap.getHeight();
+                int width = bitmap.getWidth();
                 String id = UUID.randomUUID().toString();
 
                 photo = new Photo(id, selectedImagePath, width, height);
@@ -188,17 +184,18 @@ public class PhotoActivity extends AppCompatActivity {
         return byteArray;
     }
 
-    public void loadBitmap(Uri url)
+    public Bitmap loadBitmap(Uri url)
     {
         Bitmap bitmap = null;
 
         try {
             bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), url);
+            return bitmap;
         } catch (Exception e) {
             e.fillInStackTrace();
         }
 
-        photo.setPhotoOriginal(bitmap);
+        return bitmap;
     }
 
 }
