@@ -5,6 +5,7 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -74,6 +75,7 @@ public class CustomCameraActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
+                startActivity(new Intent(CustomCameraActivity.this, ScreenSlidePagerActivity.class));
             }
         });
 
@@ -116,15 +118,21 @@ public class CustomCameraActivity extends AppCompatActivity {
                     ByteBuffer buffer = image.getPlanes()[0].getBuffer();
                     byte[] bytes = new byte[buffer.capacity()];
                     buffer.get(bytes);
-                    Bitmap bitmapImage = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
+//                    Bitmap bitmapImage = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
 
-                    Daltonize d = new Daltonize();
-                    final Bitmap daltonizedBitmap = d.daltonizeImage(bitmapImage, 1);
+//                    Daltonize d = new Daltonize();
+
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                    Bitmap newBitmap = Bitmap.createScaledBitmap(bitmap, 600, 600, false);
+
+                    final Bitmap daltonizedBitmap = Daltonize.getInstance().daltonizeImage(newBitmap, 1);
 
                     // save the bitmap to local storage
-                    ContextWrapper cw = new ContextWrapper(getBaseContext());
-                    File directory = cw.getDir("ThirdEye", Context.MODE_PRIVATE);
-                    File mypath = new File(directory, UUID.randomUUID().toString());
+                    String photoId = System.currentTimeMillis() +"";
+                    String directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString();
+                    File mypath = new File(directory, photoId);
+
+
 
                     FileOutputStream fos = null;
                     try {
@@ -141,18 +149,14 @@ public class CustomCameraActivity extends AppCompatActivity {
                         }
                     }
 
-                    // add the daltonized image to PhotoManager
                     Uri uri = Uri.fromFile(mypath);
-                    String id = UUID.randomUUID().toString();
-                    Photo photo = new Photo(id, uri, daltonizedBitmap.getWidth(), daltonizedBitmap.getHeight());
-                    mPhotoManager.add(id, photo);
+                    Photo photo = new Photo(photoId, uri, daltonizedBitmap.getWidth(), daltonizedBitmap.getHeight());
+                    mPhotoManager.add(photoId, photo);
                 }
             };
 
             Thread thread = new Thread(myRunnable);
             thread.start();
-
-
 
         }
     };
