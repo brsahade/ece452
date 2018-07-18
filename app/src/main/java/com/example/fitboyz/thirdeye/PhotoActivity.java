@@ -125,8 +125,7 @@ public class PhotoActivity extends AppCompatActivity {
         Runnable myRunnable = new Runnable(){
 
             public void run(){
-                Daltonize d = new Daltonize();
-                final Bitmap daltonizedBitmap = d.daltonizeImage(loadBitmap(photo.getUri()), typeId);
+                final Bitmap daltonizedBitmap = Daltonize.getInstance().daltonizeImage(loadBitmap(photo.getUri()), typeId);
 
                 runOnUiThread(new Runnable() {
                     @Override
