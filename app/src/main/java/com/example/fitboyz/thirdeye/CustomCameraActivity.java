@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.Image;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -125,12 +126,14 @@ public class CustomCameraActivity extends AppCompatActivity {
                     Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                     Bitmap newBitmap = Bitmap.createScaledBitmap(bitmap, 600, 600, false);
 
+//                    final Bitmap daltonizedBitmap = newBitmap;
                     final Bitmap daltonizedBitmap = Daltonize.getInstance().daltonizeImage(newBitmap, 1);
 
                     // save the bitmap to local storage
                     String photoId = System.currentTimeMillis() +"";
+                    String photoName = photoId + ".jpg";
                     String directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString();
-                    File mypath = new File(directory, photoId);
+                    File mypath = new File(directory, photoName);
 
 
 
@@ -139,15 +142,19 @@ public class CustomCameraActivity extends AppCompatActivity {
                         fos = new FileOutputStream(mypath);
                         // Use the compress method on the BitMap object to write image to the OutputStream
                         daltonizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                        fos.close();
+                        fos.flush();
                     } catch (Exception e) {
                         e.printStackTrace();
-                    } finally {
-                        try {
-                            fos.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
                     }
+
+                    MediaScannerConnection.scanFile(CustomCameraActivity.this, new String[]{directory.toString()}, null,
+                            new MediaScannerConnection.OnScanCompletedListener() {
+                                public void onScanCompleted(String path, Uri uri) {
+                                    Log.i("ExternalStorage", "Scanned " + path + ":");
+                                    Log.i("ExternalStorage", "-> uri=" + uri);
+                                }
+                            });
 
                     Uri uri = Uri.fromFile(mypath);
                     Photo photo = new Photo(photoId, uri, daltonizedBitmap.getWidth(), daltonizedBitmap.getHeight());

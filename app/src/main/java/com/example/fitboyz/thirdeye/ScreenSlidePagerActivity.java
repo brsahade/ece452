@@ -8,6 +8,9 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.PagerAdapter;
 
+import java.util.HashMap;
+import java.util.List;
+
 public class ScreenSlidePagerActivity extends FragmentActivity {
 
     /**
@@ -25,12 +28,14 @@ public class ScreenSlidePagerActivity extends FragmentActivity {
      * The pager adapter, which provides the pages to the view pager widget.
      */
     private PagerAdapter mPagerAdapter;
+    private List<Photo> photoList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_screen_slide);
 
+        photoList = PhotoManager.getInstance().getPhotoList();
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (ViewPager) findViewById(R.id.pager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
@@ -60,12 +65,12 @@ public class ScreenSlidePagerActivity extends FragmentActivity {
 
         @Override
         public Fragment getItem(int position) {
-            return new ScreenSlidePageFragment();
+            return ScreenSlidePageFragment.newInstance(position);
         }
 
         @Override
         public int getCount() {
-            return NUM_PAGES;
+            return photoList.size();
         }
     }
 
